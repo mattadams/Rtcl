@@ -1,0 +1,423 @@
+#--------------------------------------------------------------------
+# Sample configure.in for Tcl Extensions.  The only places you should
+# need to modify this file are marked by the string __CHANGE__
+#--------------------------------------------------------------------
+
+#--------------------------------------------------------------------
+# __CHANGE__
+# This very first macro is used to verify that the configure script can 
+# find the sources.  The argument to AC_INIT should be a unique filename
+# for this package, and can be a relative path, such as:
+#
+# AC_INIT(../generic/tcl.h)
+#--------------------------------------------------------------------
+
+AC_INIT(Rtcl.c)
+
+#--------------------------------------------------------------------
+# __CHANGE__
+# Set your package name and version numbers here.  The NODOT_VERSION is
+# required for constructing the library name on systems that don't like
+# dots in library names (Windows).  The VERSION variable is used on the
+# other systems.
+#--------------------------------------------------------------------
+
+PACKAGE=Rtcl
+
+MAJOR_VERSION=0
+MINOR_VERSION=3
+PATCHLEVEL=
+
+VERSION=${MAJOR_VERSION}.${MINOR_VERSION}${PATCHLEVEL}
+NODOT_VERSION=${MAJOR_VERSION}${MINOR_VERSION}
+
+
+AC_SUBST(PACKAGE)
+AC_SUBST(VERSION)
+
+#--------------------------------------------------------------------
+# We put this here so that you can compile with -DVERSION="1.2" to
+# encode the package version directly into the source files.
+#--------------------------------------------------------------------
+
+eval AC_DEFINE_UNQUOTED(VERSION, "${VERSION}")
+
+#--------------------------------------------------------------------
+# Check whether --enable-gcc or --disable-gcc was given.  Do this 
+# before AC_CYGWIN is called so the compiler can 
+# be fully tested by built-in autoconf tools.
+# This macro also calls AC_PROG_CC to set the compiler if --enable-gcc
+# was not used.
+#--------------------------------------------------------------------
+
+SC_ENABLE_GCC
+AC_PROG_INSTALL
+
+#--------------------------------------------------------------------
+# Checks to see if the make program sets the $MAKE variable.
+#--------------------------------------------------------------------
+
+AC_PROG_MAKE_SET
+
+#--------------------------------------------------------------------
+# Find ranlib
+#--------------------------------------------------------------------
+
+AC_PROG_RANLIB
+
+#--------------------------------------------------------------------
+# This macro performs additional compiler tests.
+#--------------------------------------------------------------------
+
+# This doesn't seem to work right with autoconf 2.53
+#AC_CYGWIN
+
+#--------------------------------------------------------------------
+# Determines the correct binary file extension (.o, .obj, .exe etc.)
+#--------------------------------------------------------------------
+
+AC_OBJEXT
+AC_EXEEXT
+
+#--------------------------------------------------------------------
+# "cygpath" is used on windows to generate native path names for include
+# files.
+# These variables should only be used with the compiler and linker since
+# they generate native path names.
+#
+# Unix tclConfig.sh points SRC_DIR at the top-level directory of
+# the Tcl sources, while the Windows tclConfig.sh points SRC_DIR at
+# the win subdirectory.  Hence the different usages of SRC_DIR below.
+#
+# This must be done before calling SC_PUBLIC_TCL_HEADERS
+#--------------------------------------------------------------------
+
+case "`uname -s`" in
+    *win32* | *WIN32* | *CYGWIN_NT*)
+	CYGPATH="cygpath -w"
+    ;;
+    *)
+	CYGPATH=echo
+    ;;
+esac
+
+AC_SUBST(CYGPATH)
+
+#--------------------------------------------------------------------
+# __CHANGE__
+# Choose which headers you need.  Extension authors should try very
+# hard to only rely on the Tcl public header files.  Internal headers
+# contain private data structures and are subject to change without
+# notice.
+# This MUST be called before SC_PATH_TCLCONFIG/SC_LOAD_TCLCONFIG
+#--------------------------------------------------------------------
+
+SC_PUBLIC_TCL_HEADERS
+#SC_PRIVATE_TCL_HEADERS
+
+#--------------------------------------------------------------------
+# Load the tclConfig.sh file
+#--------------------------------------------------------------------
+
+SC_PATH_TCLCONFIG
+SC_LOAD_TCLCONFIG
+
+#--------------------------------------------------------------------
+# __CHANGE__
+# A few miscellaneous platform-specific items:
+#
+# Define a special symbol for Windows (BUILD_exampleA in this case) so
+# that we create the export library with the dll.  See sha1.h on how
+# to use this.
+#
+# Windows creates a few extra files that need to be cleaned up.
+# You can add more files to clean if your extension creates any extra
+# files.
+#
+# Define any extra compiler flags in the PACKAGE_CFLAGS variable.
+# These will be appended to the current set of compiler flags for
+# your system.
+#--------------------------------------------------------------------
+
+case "`uname -s`" in
+    *win32* | *WIN32* | *CYGWIN_NT*)
+	AC_DEFINE(BUILD_Rtcl)
+	CLEANFILES="*.lib *.dll *.exp *.ilk *.pdb vc50.pch"
+	AC_SUBST(CLEANFILES)
+    ;;
+    *)
+	CLEANFILES=
+    ;;
+esac
+
+#--------------------------------------------------------------------
+# Check whether --enable-threads or --disable-threads was given.
+# So far only Tcl responds to this one.
+#--------------------------------------------------------------------
+
+SC_ENABLE_THREADS
+
+#--------------------------------------------------------------------
+# The statement below defines a collection of symbols related to
+# building as a shared library instead of a static library.
+#--------------------------------------------------------------------
+
+SC_ENABLE_SHARED
+
+#--------------------------------------------------------------------
+# This macro figures out what flags to use with the compiler/linker
+# when building shared/static debug/optimized objects.  This information
+# is all taken from the tclConfig.sh file.
+#--------------------------------------------------------------------
+
+SC_CONFIG_CFLAGS
+
+CFLAGS_DEBUG=${TCL_CFLAGS_DEBUG}
+CFLAGS_OPTIMIZE=${TCL_CFLAGS_OPTIMIZE}
+LDFLAGS_DEBUG=${TCL_LDFLAGS_DEBUG}
+LDFLAGS_OPTIMIZE=${TCL_LDFLAGS_OPTIMIZE}
+SHLIB_LD=${TCL_SHLIB_LD}
+STLIB_LD=${TCL_STLIB_LD}
+SHLIB_CFLAGS=${TCL_SHLIB_CFLAGS}
+
+AC_SUBST(CFLAGS_DEBUG)
+AC_SUBST(CFLAGS_OPTIMIZE)
+AC_SUBST(STLIB_LD)
+AC_SUBST(SHLIB_LD)
+AC_SUBST(SHLIB_CFLAGS)
+AC_SUBST(SHLIB_LDFLAGS)
+AC_SUBST(LD_SEARCH_FLAGS)
+
+#--------------------------------------------------------------------
+# Set the default compiler switches based on the --enable-symbols 
+# option.
+#--------------------------------------------------------------------
+
+SC_ENABLE_SYMBOLS
+
+if test "${SHARED_BUILD}" = "1" ; then
+    CFLAGS='${CFLAGS_DEFAULT} ${CFLAGS_WARNING} ${SHLIB_CFLAGS}'
+else
+    CFLAGS='${CFLAGS_DEFAULT} ${CFLAGS_WARNING}'
+fi
+
+#--------------------------------------------------------------------
+# Everyone should be linking against the Tcl stub library.  If you
+# can't for some reason, remove this definition.  If you aren't using
+# stubs, you also need to modify the SHLIB_LD_LIBS setting below to
+# link against the non-stubbed Tcl library.
+#--------------------------------------------------------------------
+
+AC_DEFINE(USE_TCL_STUBS)
+
+#--------------------------------------------------------------------
+# This macro generates a line to use when building a library.  It
+# depends on values set by the SC_ENABLE_SHARED, SC_ENABLE_SYMBOLS,
+# and SC_LOAD_TCLCONFIG macros above.
+#--------------------------------------------------------------------
+
+SC_MAKE_LIB
+
+#--------------------------------------------------------------------
+# eval these two values to dereference the ${DBGX} variable.
+#--------------------------------------------------------------------
+
+eval "SHARED_LIB_SUFFIX=${TCL_SHARED_LIB_SUFFIX}"
+eval "UNSHARED_LIB_SUFFIX=${TCL_UNSHARED_LIB_SUFFIX}"
+
+#--------------------------------------------------------------------
+# Shared libraries and static libraries have different names.
+#--------------------------------------------------------------------
+
+case "`uname -s`" in
+    *win32* | *WIN32* | *CYGWIN_NT*)
+	if test "${SHARED_BUILD}" = "1" ; then
+	    SHLIB_LD_LIBS="\"`cygpath -w ${TCL_BIN_DIR}/${TCL_STUB_LIB_FILE}`\" ${TCL_SHLIB_LD_LIBS}"
+	    eval "${PACKAGE}_LIB_FILE=${PACKAGE}${SHARED_LIB_SUFFIX}"
+	    RANLIB=:
+	else
+	    eval "${PACKAGE}_LIB_FILE=${PACKAGE}${UNSHARED_LIB_SUFFIX}"
+	fi
+	;;
+    *)
+	if test "${SHARED_BUILD}" = "1" ; then
+	    SHLIB_LD_LIBS="${TCL_STUB_LIB_SPEC}"
+	    eval "${PACKAGE}_LIB_FILE=lib${PACKAGE}${SHARED_LIB_SUFFIX}"
+	    RANLIB=:
+	else
+	    eval "${PACKAGE}_LIB_FILE=lib${PACKAGE}${UNSHARED_LIB_SUFFIX}"
+	fi
+	;;
+esac
+
+#--------------------------------------------------------------------
+# __CHANGE__
+# Change the name from exampeA_LIB_FILE to match your package name.
+#--------------------------------------------------------------------
+
+AC_SUBST(Rtcl_LIB_FILE)
+
+#--------------------------------------------------------------------
+# Find tclsh so that we can run pkg_mkIndex to generate the pkgIndex.tcl
+# file during the install process.  Don't run the TCLSH_PROG through
+# ${CYGPATH} because it's being used directly by make.
+# Require that we use a tclsh shell version 8.2 or later since earlier
+# versions have bugs in the pkg_mkIndex routine.
+#
+# NDM: use tclsh8.4 or later; Rtcl requires this.
+#
+#--------------------------------------------------------------------
+
+AC_PATH_PROGS(TCLSH_PROG, tclsh8.4${EXEEXT} tclsh84${EXEEXT} tclsh${EXEEXT}, :, ${exec_prefix}:${PATH})
+
+if test "x${TCLSH_PROG}" = "x:" ; then
+    AC_MSG_WARN(No tclsh executable found.  You will have to build the pkgIndex.tcl file manually.)
+fi
+AC_SUBST(TCLSH_PROG)
+
+
+#--------------------------------------------------------------------
+# Find all the R-related stuff: include files, libraries, ...
+#--------------------------------------------------------------------
+
+AC_PATH_PROGS(R_PROG, R, , ${exec_prefix}:${PATH})
+
+if test "x${R_PROG}" = "x" ; then
+    echo "Couldn't find R" >&2
+    exit 1
+fi
+
+$R_PROG CMD BATCH echohome.R
+AWKSCRIPT='BEGIN {found=0;}
+/^@@@$/ {found=1;}
+{if (found) {print $0}}'
+R_HOME=`cat echohome.Rout | awk "$AWKSCRIPT" | head -n 2 | tail -n 1 | sed 's/[[	 ]]*//g'`
+echo "R home directory is $R_HOME"
+
+R_INC_DIR="$R_HOME/include"
+if test ! -d $R_INC_DIR ; then
+    echo "No R include directory"
+    exit 1
+fi
+echo "R include directory is $R_INC_DIR"
+
+R_INCLUDES="-I\"$R_INC_DIR\""
+
+$R_PROG CMD BATCH libpath.R
+AWKSCRIPT='BEGIN {found=0;}
+/^@@@$/ {found=1;}
+{if (found) {print $0}}'
+R_LD_LIB_PATH=`cat libpath.Rout | awk "$AWKSCRIPT" | head -n 2 | tail -n 1 | sed 's/[[	 ]]*//g'`
+echo "R library path is $R_LD_LIB_PATH"
+
+R_INC_DIR="$R_HOME/include"
+if test ! -d $R_INC_DIR ; then
+    echo "No R include directory"
+    exit 1
+fi
+echo "R include directory is $R_INC_DIR"
+
+R_INCLUDES="-I\"$R_INC_DIR\""
+
+# It turns out we also need to add the R source include directory
+# to the include path (for Defn.h). I hope that eventually this
+# will not be necessary.
+
+AC_ARG_WITH(R-src, [  -with-R-src=DIR		use R source from DIR],
+	R_SRC_DIR=$withval, R_SRC_DIR='')
+if test -z "$R_SRC_DIR"; then
+    # Try to find the source for the latest version of R.
+    # (We assume it's R version 1.x or 2.x.) NOTE: this works
+    # on my system, but there's no guarantee it will work anywhere else.
+
+    echo "Looking for R source. This may take a while..."
+    R_CANDIDATE_LIST=''
+    for TRY_DIR in $HOME /usr/local/src /usr/src
+    do
+	DIR_LIST=`find $TRY_DIR -name 'R-[[12]].[[0-9]].[[0-9]]' -type d -print`
+
+	for DIR in $DIR_LIST
+	do
+	    if test -f $DIR/src/include/Defn.h ; then
+		R_CANDIDATE_LIST="$R_CANDIDATE_LIST $DIR"
+	    fi
+	done
+    done
+
+    R_SRC_DIR=''
+    MAJOR_VERS=0
+    MINOR_VERS=0
+    PATCH_LEVEL=0
+    for DIR in $R_CANDIDATE_LIST
+    do
+	MAJ=`echo "$DIR" | sed -e 's/^.*R-\([[12]]\)\..*$/\1/'`
+	MIN=`echo "$DIR" | sed -e 's/^.*R-[[12]]\.\([[0-9]]\)\..*$/\1/'`
+	PCH=`echo "$DIR" | sed -e 's/^.*R-[[12]]\.[[0-9]]\.\([[0-9]]\).*$/\1/'`
+
+	if test $MAJ -gt $MAJOR_VERS ; then
+	    MAJOR_VERS=$MAJ
+	    MINOR_VERS=$MIN
+	    PATCH_LEVEL=$PCH
+	    R_SRC_DIR=$DIR
+	elif test $MAJ -eq $MAJOR_VERS ; then
+	    if test $MIN -gt $MINOR_VERS ; then
+		MINOR_VERS=$MIN
+		PATCH_LEVEL=$PCH
+		R_SRC_DIR=$DIR
+	    elif test $MIN -eq $MINOR_VERS ; then
+		if test $PCH -gt $PATCH_LEVEL ; then
+		    PATCH_LEVEL=$PCH
+		    R_SRC_DIR=$DIR
+		fi
+	    fi
+	fi
+    done
+fi
+
+if test -z "$R_SRC_DIR"; then
+    echo "No R source directory"
+    exit 1
+fi
+echo "R source directory is $R_SRC_DIR"
+
+R_BIN_DIR="$R_HOME/bin"
+if test ! -d $R_BIN_DIR ; then
+    echo "No R bin directory"
+    exit 1
+fi
+echo "R binary directory is $R_BIN_DIR"
+
+R_LIB_DIR="$R_HOME/lib"
+echo "R library directory is $R_LIB_DIR"
+
+R_LIB="$R_LIB_DIR/libR${SHLIB_SUFFIX}"
+if test ! -f $R_LIB ; then
+    echo "No R shared library file"
+    exit 1
+fi
+echo "R library file is $R_LIB"
+
+# Add the flags we need for linking R
+
+#R_LIB_SPEC="-L$R_LIB_DIR -lR"
+R_LIB_SPEC="-L$R_LIB_DIR -lR"
+AC_SUBST(R_LIB_SPEC)
+SHLIB_LD_LIBS="$SHLIB_LD_LIBS $R_LIB_SPEC $LD_SEARCH_FLAGS"
+AC_SUBST(SHLIB_LD_LIBS)
+
+R_INCLUDES="$R_INCLUDES -I\"${R_SRC_DIR}/src/include\""
+R_HOME_STRING="\"\\\"${R_HOME}\\\"\""
+AC_SUBST(R_HOME_STRING)
+AC_SUBST(R_INC_DIR)
+AC_SUBST(R_BIN_DIR)
+AC_SUBST(R_LIB_DIR)
+AC_SUBST(R_LIB)
+AC_SUBST(R_LD_LIB_PATH)
+
+AC_SUBST(R_INCLUDES)
+
+#--------------------------------------------------------------------
+# Finally, substitute all of the various values into the Makefile.
+#--------------------------------------------------------------------
+
+AC_OUTPUT([Makefile])

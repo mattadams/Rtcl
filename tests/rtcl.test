@@ -1,0 +1,113 @@
+# Commands covered: rtcl
+#
+# This file contains a collection of tests for the Rtcl extension.
+# Sourcing this file into Tcl runs the tests and generates output for
+# errors.  No output means no errors were found.
+#
+# See the file "LICENCE" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+
+if {$tcl_platform(platform) eq "unix" && $tcl_platform(os) eq "FreeBSD"} {
+    if {[info exists env(LD_LIBRARY_PATH)] == 0} {
+	puts stderr "*** WARNING FOR FreeBSD ***"
+	puts stderr "LD_LIBRARY_PATH must exist and be set to R's runtime LD_LIBRARY_PATH."
+	puts stderr "Expect this test to fail unless LD_LIBRARY_PATH is set accordingly."
+	puts stderr "See Rtcl README file for details.\n"
+    }  
+}  
+   
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import ::tcltest::*
+}
+
+# Would typically use "package require Rtcl" but it may not be
+# installed yet
+load ./libRtcl1.0.so
+
+test eval-1.0 {
+    Evaluate an R expression (successfully)
+} -body {
+    ::rtcl::eval {sqrt(144)}
+} -result {} -returnCodes {ok}
+
+test eval-1.1 {
+    Evaluate an R expression that cannot be parsed
+} -body {
+    ::rtcl::eval "x <- c\(0,"
+} -result {R parse error} -returnCodes {error}
+
+test eval-1.2 {
+    Evaluate an R expression that results in an error
+} -body {
+    ::rtcl::eval {dim(z) <- c(3,5,100,foo)}
+} -result {Error: object 'foo' not found} -returnCodes {error}
+
+test source-1.0 {
+    Source an R file (successfully)
+} -body {
+    ::rtcl::source {tests/source-1.0.R}
+} -result {} -returnCodes {ok}
+
+test source-1.1 {
+    Source an R file (unsuccessfully)
+} -body {
+    ::rtcl::source {tests/source-1.1.R}
+} -result {Error in eval(ei, envir) : test of `options(error=expression(NULL))'} -returnCodes {error}
+
+test source-1.2 {
+    Source a non-existent R file
+} -body {
+    ::rtcl::source {tests/source-1.2.R}
+} -result {Error in file*cannot open the connection} -match {glob} -returnCodes {error}
+
+test gettype-1.0 {
+    Get the R data type resulting from an R expression (successful)
+} -body {
+    set results [list]
+    lappend results [::rtcl::gettype {cat("hello, world")}]
+    lappend results [::rtcl::gettype {1}]
+    lappend results [::rtcl::gettype {as.character(0:9)}]
+    lappend results [::rtcl::gettype {list(name="Fred", wife="Mary", no.children=3, child.ages=c(4,7,9))}]
+    return $results
+} -result {nil real string vector} -returnCodes {return}
+
+test gettype-1.1 {
+    Get the R data type resulting from an R expression (parsing error)
+} -body {
+    ::rtcl::gettype "x <- c\(0,"
+} -result {R parse error} -returnCodes {error}
+
+test gettype-1.2 {
+    Get the R data type resulting from an R expression (expression error)
+} -body {
+    ::rtcl::gettype {x}
+} -result {Error: object 'x' not found} -returnCodes {error}
+
+test getvalue-1.0 {
+    Get the Tcl values of some R expressions (successful)
+} -body {
+    set results [list]
+    lappend results [::rtcl::getvalue {c(10, 10, 10)}]
+    lappend results [::rtcl::getvalue {sqrt(144)}]
+    lappend results [::rtcl::getvalue {c(10.4, 5.6, 3.1, 6.4, 21.7) -> m; 1/m;}]
+    lappend results [::rtcl::getvalue {x <- 10; s1 <- rep(x, times=5); s1;}]
+    return $results
+} -result {{10.0 10.0 10.0} 12.0 {0.09615384615384615 0.17857142857142858 0.3225806451612903 0.15625 0.04608294930875576} {10.0 10.0 10.0 10.0 10.0}} -returnCodes {ok return}
+
+test getvalue-1.1 {
+    Get the Tcl value of an R expression (parsing error)
+} -body {
+    return [::rtcl::getvalue "c\(10, 10, 10"]
+} -result {R parse error} -returnCodes {error}
+
+test getvalue-1.2 {
+    Get the Tcl value of an R expression (expression error)
+} -body {
+    ::rtcl::getvalue {y}
+} -result {Error: object 'y' not found} -returnCodes {error}
+
+::tcltest::cleanupTests
+
+return

@@ -1,0 +1,54 @@
+	Rtcl - A Tcl Extension for Embedding the R Statistical Language
+	---------------------------------------------------------------
+
+DESCRIPTION
+===========
+
+The Rtcl extension embeds an interpreter for the R programming language
+(see http://www.r-project.org) inside a Tcl interpreter. It provides
+commands for evaluating R expressions, for importing their values
+into Tcl, and for determining their type.
+
+REQUIREMENTS
+============
+
+Rtcl requires several software packages to be installed:
+
+	1. Tcl, version 8.x or higher
+	2. R, built with shared libraries
+	3. The R sources. (Unfortunately, some of the functions in
+	   R that are required to evaluate R expressions are private,
+	   so the source includes are needed.)
+
+INSTALLATION
+============
+
+Installation of Rtcl follows Tcl's usual configure/make/make install
+pattern. A typical installation on Unix will look like:
+
+	% tar xvzf Rtcl0.1.tar.gz
+	% cd Rtcl0.1
+	% ./configure
+	% make
+	% su
+	password:
+	# make install
+	# ^D
+	%
+
+The configure script accepts a number of options, including:
+
+	--with-tcl=tclDir	Take Tcl config info from "tclDir"
+	--with-R-src=RSrcDir	Find the R sources in RSrcDir
+
+Specifying the "--with-R-src" option will considerably speed up
+the configuration process; if it isn't specified, the configure script
+does a "find" command to find the R source directory, searching through
+your entire home directory (and a few other places).
+
+NOTES
+=====
+
+The current version of Rtcl is 0.1. It is very definitely alpha-quality
+code. So far, it has only been run on Redhat Linux 8.0.
+

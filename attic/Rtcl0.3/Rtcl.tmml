@@ -1,0 +1,41 @@
+[comment {-*- tcl -*- Rtcl package}]
+[manpage_begin Rtcl n 0.1]
+[copyright {2003 Neil McKay <mckay@eecs.umich.edu>}]
+[moddesc {Interface to the R Statistical Language}]
+[titledesc {Embed an interpreter for the R Statistical Language into Tcl}]
+[require Tcl 8.4]
+[require Rtcl]
+[description]
+
+The Rtcl package provides a way to embed an interpreter for the R
+statistical language into Tcl, and make it accessible via Tcl commands.
+
+[section COMMANDS]
+
+[list_begin definitions]
+
+[call [cmd ::Rtcl::eval] [arg R_expression]]
+
+Evaluates argument [arg R_expression] inside the embedded R interpreter.
+Returns an error message if [arg R_expression] contains an error,
+and returns nothing otherwise.
+
+[call [cmd ::Rtcl::getval] [arg R_expression]]
+
+Evaluates argument [arg R_expression] inside the embedded R interpreter.
+Returns an error if the R expression can't be evaluated.
+It then tries to convert the returned value to something equivalent in
+Tcl. If it can, it returns the value; otherwise, it returns an error.
+
+[call [cmd ::Rtcl::type] [arg R_expression]]
+
+Evaluates [arg R_expression] inside the embedded R interpreter.
+Returns an error if the R expression can't be evaluated.
+Otherwise, it returns the type of the R expression.
+
+[list_end]
+
+[keywords Rtcl R Statistics]
+
+[manpage_end]
+

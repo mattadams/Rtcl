@@ -1,0 +1,146 @@
+	Rtcl - A Tcl Extension for Embedding the R Statistical Language
+	---------------------------------------------------------------
+
+DESCRIPTION
+===========
+
+The Rtcl extension embeds an interpreter for the R programming
+language (see http://www.r-project.org) inside a Tcl interpreter. It
+provides commands for evaluating R expressions, for importing their
+values into Tcl, and for determining their type.
+
+
+REQUIREMENTS
+============
+
+Rtcl requires the following software packages to be installed:
+
+    1. Tcl, version 8.6 or newer
+    2. R, version 3.4 or newer, built with shared libraries
+    3. Typical R install with include files
+	
+
+INSTALLATION
+============
+
+Installation of Rtcl follows Tcl's usual configure/make/make install
+pattern. A typical installation on Unix will look like:
+
+    % tar xvzf Rtcl1.0.tar.gz
+    % cd Rtcl1.0
+    % ./configure
+    % make
+    % make test
+    % su
+    password:
+    # make install
+    # ^D
+    %
+
+The configure script accepts a number of options, including:
+
+    --with-tcl=tclDir        Directory containing "tclConfig.sh"
+    --with-R=pathToScript    Fully qualified path to R main script
+
+You may need to specify "--with-R" if the main R script is not in your
+PATH or is somewhere other than a reasonable default of "/usr/local/bin/R".
+
+Note that R has a number of executable scripts and binaries but only
+the primary one will suffice in this case.
+
+
+USING IT
+========
+
+Fire up your tclsh:
+
+    tclsh8.6
+    % package require Rtcl
+    1.0
+
+Use `man Rtcl` for further details.
+
+If you are running FreeBSD you may see the following error when you
+try to load the library directly or require the Rtcl package:
+
+    couldn't load file "/usr/local/lib/Rtcl1.0/libRtcl1.0.so": /lib/libgcc_s.so.1:
+    version GCC_4.6.0 required by /usr/local/lib/gcc6/libgfortran.so.3 not found
+
+If this happens to you follow the instructions in "FreeBSD Notes" to
+resolve the error.
+
+
+FREEBSD NOTES
+=============
+
+Since R (either installed as a package or from ports) is compiled
+using gcc6 vs. the system cc (another long story), care must be taken
+to ensure that this extension is built with similar conditions. I use:
+
+   $ make distclean
+   $ autoconf
+   $ CC=gcc6 ./configure --with-tcl=/usr/local/lib/tcl8.6
+   $ make
+   $ make test
+   $ su
+   # make install
+   # exit
+   $
+
+However, on FreeBSD there is a long standing issue with libgcc_s.so in
+base that affects loading of this extension.
+
+Building this extension using gcc6 will cause it to be compiled and
+linked against the newer gcc libs but at run time `tclsh` finds the
+base lib first and loads that. Unfortunately, base libgcc_s doesn't
+support loading this extension (if the gcc6 libgcc_s was always
+installed and found first then we wouldn't have this problem).
+
+To workaround this issue for the dynamic linker, you must start
+`tclsh` with the correct LD_LIBRARY_PATH. I have found that it is best
+to use the same value as R. This will ensure that the gcc6 libs are
+found, since R depends on those itself.
+
+Assuming R exists in your PATH, you can run the following command to
+determine R_HOME and set LD_LIBRARY_PATH accordingly (assumes
+/bin/sh):
+
+    $ export R_HOME=`echo 'cat(R.home())' | R --slave`
+    $ . $R_HOME/etc/ldpaths
+    $ /path/to/tclsh your_script.tcl
+
+You can also find R's LD_LIBRARY_PATH by running:
+
+    $ export LD_LIBRARY_PATH=`echo 'cat(Sys.getenv("LD_LIBRARY_PATH"))' | R --slave`
+    $ /path/to/tclsh your_script.tcl
+
+If you are using a shell wrapper script to start your Tcl program as
+mentioned in https://wiki.tcl.tk/812 then you may use the following
+wrapper code:
+
+    #!/bin/sh
+    # -*- tcl -*-
+    # Wrapper script for running Tcl with command line invocation
+    # The next line is executed by /bin/sh, but not tcl \
+        R_HOME=$(echo 'cat(R.home()' | R --slave); . $R_HOME/etc/ldpaths; exec tclsh8.6 "$0" ${1+"$@"}
+
+    # Tcl code continues here
+    puts "Hello, World"
+
+Yes, it's ugly. I don't know a way around it besides messing with
+/etc/libmap.conf or /usr/local/etc/libmap.d and you may not want to do
+that if other things run on your system and happen to depend on base
+libgcc_s lib.
+
+I am currently building this extension using gcc6 6.4.0 on FreeBSD
+11.1-RELEASE-p9 with Tcl 8.6.8 (TEA 3.13) and R 3.4.4. All related
+software is installed from packages. YMMV if you use ports or have
+changed default configurations.
+
+
+HISTORY
+=======
+
+Versions 0.1 through 0.3 were initially developed and released by Neil
+McKay on Redhat Linux 8. Versions 1.0 and later were revised and
+packaged by Matt Adams on FreeBSD 11.

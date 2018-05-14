@@ -1,5 +1,5 @@
 /*
- * hello.c -- A minimal Tcl C extension.
+ * rtcl.c -- A minimal Tcl C extension for embedded R
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -179,7 +179,7 @@ RtoTcl(interp, retObjPtrPtr, s)
     } else if (l == 1) {
       return(RtoTcl(interp, retObjPtrPtr, CAR(s)));
     } else {
-      objv = (Tcl_Obj **) Tcl_Alloc(l*sizeof(Tcl_Obj *));
+      objv = (Tcl_Obj **) Tcl_Alloc(l * sizeof(Tcl_Obj *));
       
       for (i = 0; s != NULL && s != R_NilValue; i++, s = CDR(s)) {
 	RtoTcl(interp, &(objv[i]), CAR(s));
@@ -368,7 +368,7 @@ REval(interp, s, objc, objv)
      Tcl_Interp *interp;		/* For error messages */
      SEXP *s;			        /* S-Expression to put result in */
      int objc;			        /* Number of arguments */
-     Tcl_Obj *CONST objv[];	                /* Arguments */
+     Tcl_Obj *CONST objv[];	        /* Arguments */
 {
   int i, l, evalError;
   ParseStatus status;
@@ -376,12 +376,24 @@ REval(interp, s, objc, objv)
   SEXP exp, val;
   SEXP geterr, err;
   char *errmsg;
+  int offset, verbose;
+
+  /* Check for verbose option */
+  if (strcmp(Tcl_GetString(objv[1]),"-verbose") == 0) {
+    offset = 2;
+    verbose = 1;
+    objc -= 2;
+  } else {
+    offset = 1;
+    verbose = 0;
+    objc--;
+  }
 
   /* Get the exp to evaluate */
   text = PROTECT(allocVector(STRSXP, objc));
   
   for (i = 0; i < objc; i++ ) {
-    SET_STRING_ELT(text, i, mkChar(Tcl_GetString(objv[i])));
+    SET_STRING_ELT(text, i, mkChar(Tcl_GetString(objv[i+offset])));
   }
 
   /* Parse it */
@@ -410,7 +422,9 @@ REval(interp, s, objc, objv)
     
     return TCL_ERROR;
   } else {
-    PrintValue(val);
+    if (verbose) {
+      PrintValue(val);
+    }
   }
   
   l = length(exp);
@@ -444,17 +458,17 @@ Rtcl_eval(clientData, interp, objc, objv)
      ClientData clientData;	/* Not used. */
      Tcl_Interp *interp;	/* Current interpreter */
      int objc;			/* Number of arguments */
-Tcl_Obj *CONST objv[];	        /* Arguments */
+     Tcl_Obj *CONST objv[];	/* Arguments */
 {
   SEXP ans;
 
   if (objc < 2) {
-    Tcl_WrongNumArgs(interp, 1, objv, "{R Expression}");
+    Tcl_WrongNumArgs(interp, 1, objv, "?-verbose? {R Expression}");
     return TCL_ERROR;
   }
 
   /* Evaluate the args */
-  if (REval(interp, &ans, objc - 1, &(objv[1])) != TCL_OK) {
+  if (REval(interp, &ans, objc, objv) != TCL_OK) {
     return TCL_ERROR;
   }
 
@@ -489,13 +503,25 @@ Rtcl_source(clientData, interp, objc, objv)
   SEXP exp, val;
   SEXP geterr, err;
   char *errmsg;
+  int offset, verbose;
 
   if (objc > 2) {
-    Tcl_WrongNumArgs(interp, 1, objv, "{source_file.R}");
+    Tcl_WrongNumArgs(interp, 1, objv, "?-verbose? {source_file.R}");
     return TCL_ERROR;
   }
 
-  PROTECT(exp = lang2(install("source"), mkString(Tcl_GetString(objv[1]))));
+  /* Check for verbose option */
+  if (strcmp(Tcl_GetString(objv[1]),"-verbose") == 0) {
+    offset = 2;
+    verbose = 1;
+    objc -= 2;
+  } else {
+    offset = 1;
+    verbose = 0;
+    objc--;
+  }
+
+  PROTECT(exp = lang2(install("source"), mkString(Tcl_GetString(objv[offset]))));
   val = R_tryEval(exp, R_GlobalEnv, &evalError);
 
   if (evalError) {
@@ -512,7 +538,9 @@ Rtcl_source(clientData, interp, objc, objv)
 
     return TCL_ERROR;
   } else {
-    PrintValue(val);
+    if (verbose) {
+      PrintValue(val);
+    }
   }
 
   UNPROTECT(1);
@@ -546,12 +574,12 @@ Rtcl_gettype(clientData, interp, objc, objv)
     Tcl_Obj *r;
 
     if (objc < 2) {
-	Tcl_WrongNumArgs(interp, 1, objv, "{R_expression ...}");
+	Tcl_WrongNumArgs(interp, 1, objv, "?-verbose? {R_expression ...}");
 	return TCL_ERROR;
     }
 
     /* Evaluate the args */
-    if (REval(interp, &ans, objc - 1, &(objv[1])) != TCL_OK) {
+    if (REval(interp, &ans, objc, objv) != TCL_OK) {
 	return TCL_ERROR;
     }
 
@@ -592,18 +620,18 @@ Rtcl_getvalue(clientData, interp, objc, objv)
      ClientData clientData;	/* Not used. */
      Tcl_Interp *interp;	/* Current interpreter */
      int objc;			/* Number of arguments */
-Tcl_Obj *CONST objv[];	        /* Arguments */
+     Tcl_Obj *CONST objv[];	/* Arguments */
 {
   SEXP ans;
   Tcl_Obj *r;
 
   if (objc < 2) {
-    Tcl_WrongNumArgs(interp, 1, objv, "{R Expression}");
+    Tcl_WrongNumArgs(interp, 1, objv, "?-verbose? {R Expression}");
     return TCL_ERROR;
   }
 
   /* Evaluate the args */
-  if (REval(interp, &ans, objc - 1, &(objv[1])) != TCL_OK) {
+  if (REval(interp, &ans, objc, objv) != TCL_OK) {
     return TCL_ERROR;
   }
 
@@ -667,16 +695,16 @@ int DLLEXPORT Rtcl_Init(Tcl_Interp *interp)
     return TCL_ERROR;
   }
   
-  Tcl_CreateObjCommand(interp, "::rtcl::eval", Rtcl_eval,
+  Tcl_CreateObjCommand(interp, "::rtcl::eval", (Tcl_ObjCmdProc *) Rtcl_eval,
 		       (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
   
-  Tcl_CreateObjCommand(interp, "::rtcl::source", Rtcl_source,
+  Tcl_CreateObjCommand(interp, "::rtcl::source", (Tcl_ObjCmdProc *) Rtcl_source,
 		       (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
   
-  Tcl_CreateObjCommand(interp, "::rtcl::gettype", Rtcl_gettype,
+  Tcl_CreateObjCommand(interp, "::rtcl::gettype", (Tcl_ObjCmdProc *) Rtcl_gettype,
 		       (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
 
-  Tcl_CreateObjCommand(interp, "::rtcl::getvalue", Rtcl_getvalue,
+  Tcl_CreateObjCommand(interp, "::rtcl::getvalue", (Tcl_ObjCmdProc *) Rtcl_getvalue,
 		       (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL);
     
   return TCL_OK;

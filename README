@@ -70,6 +70,16 @@ If this happens to you follow the instructions in "FreeBSD Notes" to
 resolve the error.
 
 
+KNOWN TO WORK ON
+================
+
+- FreeBSD 11.1 with Tcl 8.6.8 and R 3.4.4
+  Reported by Matt Adams
+
+- Ubuntu 14.4 LTS with Tcl 8.6.7 and R 3.4.4
+  Reported by Luc Moulinier
+
+
 FREEBSD NOTES
 =============
 
@@ -144,3 +154,5 @@ HISTORY
 Versions 0.1 through 0.3 were initially developed and released by Neil
 McKay on Redhat Linux 8. Versions 1.0 and later were revised and
 packaged by Matt Adams on FreeBSD 11.
+
+See ChangeLog for detailed notes.

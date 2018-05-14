@@ -1,3 +1,17 @@
+2018-05-13  Matt Adams  <matt.adams@stuffbymatt.ca>
+
+	* rtcl.c: New Rtcl 1.1 version adds optional -verbose switch to
+	all Rtcl commands. Presence of -verbose causes embedded R
+	interpreter to print the results of R expressions to stdout as
+	they are evaluated. This may be used to debug the results of R
+	expressions as Rtcl commands are run. This was the default in 1.0
+	however it causes huge log files. Change based on patch and
+	suggestion provided by Luc Moulinier <luc.moulinier@unistra.fr>.
+
+	* doc/Rtcl.n: Updated nroff man page for -verbose switch
+
+	* doc/Rtcl.tmml: Updated doctools man page for -verbose switch
+
 2018-04-13  Matt Adams  <matt.adams@radicaldynamic.com>
 
 	* rtcl.c: New Rtcl 1.0 version compatible with Tcl 8.6.8 and R

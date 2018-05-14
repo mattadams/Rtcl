@@ -26,8 +26,8 @@ INSTALLATION
 Installation of Rtcl follows Tcl's usual configure/make/make install
 pattern. A typical installation on Unix will look like:
 
-    % tar xvzf Rtcl1.0.tar.gz
-    % cd Rtcl1.0
+    % tar xvzf Rtcl1.1.tar.gz
+    % cd Rtcl1.1
     % ./configure
     % make
     % make test
@@ -56,14 +56,14 @@ Fire up your tclsh:
 
     tclsh8.6
     % package require Rtcl
-    1.0
+    1.1
 
 Use `man Rtcl` for further details.
 
 If you are running FreeBSD you may see the following error when you
 try to load the library directly or require the Rtcl package:
 
-    couldn't load file "/usr/local/lib/Rtcl1.0/libRtcl1.0.so": /lib/libgcc_s.so.1:
+    couldn't load file "/usr/local/lib/Rtcl1.1/libRtcl1.1.so": /lib/libgcc_s.so.1:
     version GCC_4.6.0 required by /usr/local/lib/gcc6/libgfortran.so.3 not found
 
 If this happens to you follow the instructions in "FreeBSD Notes" to

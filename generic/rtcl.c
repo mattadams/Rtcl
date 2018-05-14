@@ -380,6 +380,11 @@ REval(interp, s, objc, objv)
 
   /* Check for verbose option */
   if (strcmp(Tcl_GetString(objv[1]),"-verbose") == 0) {
+    if (objc < 3) {
+      Tcl_WrongNumArgs(interp, 1, objv, "-verbose {R Expression}");
+      return TCL_ERROR;
+    }
+    
     offset = 2;
     verbose = 1;
     objc -= 2;
@@ -463,10 +468,10 @@ Rtcl_eval(clientData, interp, objc, objv)
   SEXP ans;
 
   if (objc < 2) {
-    Tcl_WrongNumArgs(interp, 1, objv, "?-verbose? {R Expression}");
-    return TCL_ERROR;
+      Tcl_WrongNumArgs(interp, 1, objv, "?-verbose? {R Expression}");
+      return TCL_ERROR;
   }
-
+  
   /* Evaluate the args */
   if (REval(interp, &ans, objc, objv) != TCL_OK) {
     return TCL_ERROR;
@@ -505,13 +510,18 @@ Rtcl_source(clientData, interp, objc, objv)
   char *errmsg;
   int offset, verbose;
 
-  if (objc > 2) {
+  if (objc < 2) {
     Tcl_WrongNumArgs(interp, 1, objv, "?-verbose? {source_file.R}");
     return TCL_ERROR;
   }
-
+  
   /* Check for verbose option */
   if (strcmp(Tcl_GetString(objv[1]),"-verbose") == 0) {
+    if (objc < 3) {
+      Tcl_WrongNumArgs(interp, 1, objv, "-verbose {source_file.R}");
+      return TCL_ERROR;
+    }
+    
     offset = 2;
     verbose = 1;
     objc -= 2;
@@ -574,10 +584,10 @@ Rtcl_gettype(clientData, interp, objc, objv)
     Tcl_Obj *r;
 
     if (objc < 2) {
-	Tcl_WrongNumArgs(interp, 1, objv, "?-verbose? {R_expression ...}");
-	return TCL_ERROR;
+      Tcl_WrongNumArgs(interp, 1, objv, "?-verbose? {R Expression}");
+      return TCL_ERROR;
     }
-
+    
     /* Evaluate the args */
     if (REval(interp, &ans, objc, objv) != TCL_OK) {
 	return TCL_ERROR;
@@ -626,10 +636,10 @@ Rtcl_getvalue(clientData, interp, objc, objv)
   Tcl_Obj *r;
 
   if (objc < 2) {
-    Tcl_WrongNumArgs(interp, 1, objv, "?-verbose? {R Expression}");
-    return TCL_ERROR;
+      Tcl_WrongNumArgs(interp, 1, objv, "?-verbose? {R Expression}");
+      return TCL_ERROR;
   }
-
+  
   /* Evaluate the args */
   if (REval(interp, &ans, objc, objv) != TCL_OK) {
     return TCL_ERROR;

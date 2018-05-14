@@ -312,7 +312,7 @@ run\&. For example:
 
 $ tclsh
 % package require Rtcl
-1\&.0
+1\&.1
 % ::rtcl::eval {x <- 1+1}
 % ::rtcl::getvalue {x}
 2\&.0

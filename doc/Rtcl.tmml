@@ -1,12 +1,12 @@
 [comment {-*- tcl -*- Rtcl package}]
-[manpage_begin Rtcl n 1.0]
+[manpage_begin Rtcl n 1.1]
 [see_also R]
 [copyright {2003 Neil McKay <mckay@eecs.umich.edu>}]
 [copyright {2018 Matt Adams <matt.adams@radicaldynamic.com>}]
 [moddesc {Interface to the R Statistical Language}]
 [titledesc {Embed an interpreter for the R Statistical Language into Tcl}]
 [require Tcl 8.6]
-[require Rtcl 1.0]
+[require Rtcl 1.1]
 [description]
 
 The Rtcl package provides a way to embed an interpreter for the R

@@ -156,3 +156,15 @@ McKay on Redhat Linux 8. Versions 1.0 and later were revised and
 packaged by Matt Adams on FreeBSD 11.
 
 See ChangeLog for detailed notes.
+
+
+VERSION NUMBERS
+===============
+
+New releases require version number changes in the following files:
+
+README
+configure.ac (line 22)
+doc/Rtcl.tmml
+doc/Rtcl.n
+tests/rtcl.test (line 27)

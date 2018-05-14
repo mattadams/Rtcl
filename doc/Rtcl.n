@@ -3,7 +3,7 @@
 '\" Copyright (c) 2003 Neil McKay <mckay@eecs\&.umich\&.edu>
 '\" Copyright (c) 2018 Matt Adams <matt\&.adams@radicaldynamic\&.com>
 '\"
-.TH "Rtcl" n 1\&.0 Rtcl "Interface to the R Statistical Language"
+.TH "Rtcl" n 1\&.1 Rtcl "Interface to the R Statistical Language"
 .\" The -*- nroff -*- definitions below are for supplemental macros used
 .\" in Tcl/Tk manual entries.
 .\"
@@ -277,7 +277,7 @@ Rtcl \- Embed an interpreter for the R Statistical Language into Tcl
 .SH SYNOPSIS
 package require \fBTcl  8\&.6\fR
 .sp
-package require \fBRtcl  1\&.0\fR
+package require \fBRtcl  1\&.1\fR
 .sp
 \fB::rtcl::eval\fR \fI?-verbose?\fR \fIR Expression\fR
 .sp

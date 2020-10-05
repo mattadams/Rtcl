@@ -1,9 +1,9 @@
 '\"
 '\" Generated from file 'Rtcl\&.tmml' by tcllib/doctools with format 'nroff'
 '\" Copyright (c) 2003 Neil McKay <mckay@eecs\&.umich\&.edu>
-'\" Copyright (c) 2018 Matt Adams <matt\&.adams@radicaldynamic\&.com>
+'\" Copyright (c) 2020 Matt Adams <matt\&.adams@radicaldynamic\&.com>
 '\"
-.TH "Rtcl" n 1\&.1 Rtcl "Interface to the R Statistical Language"
+.TH "Rtcl" n 1\&.2 Rtcl "Interface to the R Statistical Language"
 .\" The -*- nroff -*- definitions below are for supplemental macros used
 .\" in Tcl/Tk manual entries.
 .\"
@@ -277,15 +277,15 @@ Rtcl \- Embed an interpreter for the R Statistical Language into Tcl
 .SH SYNOPSIS
 package require \fBTcl  8\&.6\fR
 .sp
-package require \fBRtcl  1\&.1\fR
+package require \fBRtcl  1\&.2\fR
 .sp
-\fB::rtcl::eval\fR \fI?-verbose?\fR \fIR Expression\fR
+\fB::rtcl::eval\fR \fI?-verbose?\fR \fIR Expression(s)\fR
 .sp
-\fB::rtcl::source\fR \fI?-verbose?\fR \fI/path/to/foo\&.R\fR
+\fB::rtcl::source\fR \fI?-verbose?\fR \fIfoo\&.R\fR
 .sp
-\fB::rtcl::gettype\fR \fI?-verbose?\fR \fIR Expression\fR
+\fB::rtcl::gettype\fR \fI?-verbose?\fR \fIR Expression(s)\fR
 .sp
-\fB::rtcl::getvalue\fR \fI?-verbose?\fR \fIR Expression\fR
+\fB::rtcl::getvalue\fR \fI?-verbose?\fR \fIR Expression(s)\fR
 .sp
 .BE
 .SH DESCRIPTION
@@ -299,20 +299,20 @@ Due to the potential for errors, it is recommended that you wrap all
 Rtcl routines with \fBcatch\fR or \fBtry\fR\&.
 .SH COMMANDS
 .TP
-\fB::rtcl::eval\fR \fI?-verbose?\fR \fIR Expression\fR
-Evaluates an \fIR Expression\fR inside the embedded R interpreter\&.
-Returns an error message if the expression cannot be parsed or
-evaluated\&. Returns nothing if successful\&.
+\fB::rtcl::eval\fR \fI?-verbose?\fR \fIR Expression(s)\fR
+Evaluates any number of \fIR Expression(s)\fR inside the embedded R
+interpreter\&.  Returns an error message if the expression cannot be
+parsed or evaluated\&. Returns nothing if successful\&.
 .sp
 If \fI-verbose\fR (optional) is present, the R interpreter will print
-the results of R expressions to stdout as they are evaluated\&. This may
-be used to debug the results of R expressions as Rtcl commands are
-run\&. For example:
+the results ofexpressions to stdout as they are evaluated\&. This may be
+used to debug the results of expressions as Rtcl commands are run\&. For
+example:
 .CS
 
 $ tclsh
 % package require Rtcl
-1\&.1
+1\&.2
 % ::rtcl::eval {x <- 1+1}
 % ::rtcl::getvalue {x}
 2\&.0
@@ -324,10 +324,10 @@ $ tclsh
 
 .CE
 .TP
-\fB::rtcl::source\fR \fI?-verbose?\fR \fI/path/to/foo\&.R\fR
+\fB::rtcl::source\fR \fI?-verbose?\fR \fIfoo\&.R\fR
 Sources a file into the embedded R interpreter\&. Takes a single
-argument that must be the fully qualified path to a valid R
-file\&. Returns an error message if the file cannot be found or properly
+argument that must be the path to a valid R file\&.
+Returns an error message if the file cannot be found or properly
 parsed, and returns nothing if successful\&.
 .sp
 If \fI-verbose\fR (optional) is present, the R interpreter will print
@@ -335,47 +335,27 @@ the results of R expressions to stdout as they are evaluated\&. This may
 be used to debug the results of R expressions as Rtcl commands are
 run\&.
 .TP
-\fB::rtcl::gettype\fR \fI?-verbose?\fR \fIR Expression\fR
-Evaluates an \fIR Expression\fR inside the embedded R interpreter\&.
-Returns an error if the expression cannot be parsed or evaluated\&.
-Otherwise, it returns the R data type of the result\&.
+\fB::rtcl::gettype\fR \fI?-verbose?\fR \fIR Expression(s)\fR
+Evaluates any number of \fIR Expression(s)\fR inside the embedded R
+interpreter\&.  Returns an error if the expression cannot be parsed or
+evaluated\&.  Otherwise, it returns the R data type of the last  result\&.
 .sp
 If \fI-verbose\fR (optional) is present, the R interpreter will print
-the results of R expressions to stdout as they are evaluated\&. This may
-be used to debug the results of R expressions as Rtcl commands are
-run\&.
+the results of expressions to stdout as they are evaluated\&. This may
+be used to debug the results of expressions as Rtcl commands are run\&.
 .TP
-\fB::rtcl::getvalue\fR \fI?-verbose?\fR \fIR Expression\fR
-Evaluates an \fIR Expression\fR inside the embedded R interpreter\&.
-Returns an error if the expression cannot be parsed or evaluated\&. It
-then tries to convert the returned value to a Tcl equivalent\&. If it
-can, it returns the value; otherwise, it returns an error\&.
+\fB::rtcl::getvalue\fR \fI?-verbose?\fR \fIR Expression(s)\fR
+Evaluates any number of \fIR Expression(s)\fR inside the embedded R
+interpreter\&.  Returns an error if the expression cannot be parsed or
+evaluated\&. It then tries to convert the returned value to a Tcl
+equivalent\&. If it can, it returns the last value; otherwise, it
+returns an error\&.
 .sp
 If \fI-verbose\fR (optional) is present, the R interpreter will print
-the results of R expressions to stdout as they are evaluated\&. This may
-be used to debug the results of R expressions as Rtcl commands are
+the results of expressions to stdout as they are evaluated\&. This may
+be used to debug the results of expressions as Rtcl commands are
 run\&.
 .PP
-.SH FREEBSD
-On FreeBSD there is a long standing issue with libgcc_s\&.so in base
-that affects loading of this extension\&. R is built using gcc6 and uses
-a special \fILD_LIBRARY_PATH\fR to instruct the dynamic linker to
-find the appropriate GCC libraries since the base libgcc_s doesn't
-supply the required references\&.
-.PP
-Likewise, \fBtclsh\fR must be started with the same \fILD_LIBRARY_PATH\fR
-in order to load the Rtcl package\&. The following commands assume
-the Bourne shell and will set up the environment accordingly\&.
-Note that \fB/path/to/R\fR must be adjusted for your system
-(typically \fB/usr/local/bin/R\fR)\&.
-.CS
-
-$ export R_HOME=`echo 'cat(R\&.home())' | /path/to/R --slave`
-$ \&. $R_HOME/etc/ldpaths
-$ /path/to/tclsh your_script\&.tcl
-
-.CE
-See the Rtcl README file for further details\&.
 .SH "SEE ALSO"
 R
 .SH KEYWORDS
@@ -383,6 +363,6 @@ R, Rtcl, Statistics, Tcl
 .SH COPYRIGHT
 .nf
 Copyright (c) 2003 Neil McKay <mckay@eecs\&.umich\&.edu>
-Copyright (c) 2018 Matt Adams <matt\&.adams@radicaldynamic\&.com>
+Copyright (c) 2020 Matt Adams <matt\&.adams@radicaldynamic\&.com>
 
 .fi

@@ -19,7 +19,7 @@ dnl	to configure the system for the local environment.
 # so that we create the export library with the dll.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rtcl], [1.1])
+AC_INIT([Rtcl], [1.2])
 
 #-----------------------------------------------------------------------
 # Find all the R-related stuff: include files, libraries, ...
@@ -86,7 +86,8 @@ AC_SUBST(R_LDFLAGS)
 # as well as PKG_LIB_FILE and PKG_STUB_LIB_FILE.
 #--------------------------------------------------------------------
 
-TEA_INIT()
+# Pass version of TEA expected or TEA_INIT as defined in tclconfig/tcl.m4 will fail
+TEA_INIT(3.9)
 
 AC_CONFIG_AUX_DIR(tclconfig)
 
@@ -96,13 +97,6 @@ AC_CONFIG_AUX_DIR(tclconfig)
 
 TEA_PATH_TCLCONFIG
 TEA_LOAD_TCLCONFIG
-
-#--------------------------------------------------------------------
-# Load the tkConfig.sh file if necessary (Tk extension)
-#--------------------------------------------------------------------
-
-#TEA_PATH_TKCONFIG
-#TEA_LOAD_TKCONFIG
 
 #-----------------------------------------------------------------------
 # Handle the --prefix=... option by defaulting to what Tcl gave.
@@ -121,6 +115,12 @@ TEA_PREFIX
 TEA_SETUP_COMPILER
 
 #-----------------------------------------------------------------------
+# Type checks.
+#-----------------------------------------------------------------------
+
+AC_CHECK_TYPE([uintptr_t], CFLAGS="$CFLAGS -DHAVE_UINTPTR_T=1")
+
+#-----------------------------------------------------------------------
 # __CHANGE__
 # Specify the C source files to compile in TEA_ADD_SOURCES,
 # public headers that need to be installed in TEA_ADD_HEADERS,
@@ -134,34 +134,11 @@ TEA_ADD_SOURCES([rtcl.c])
 TEA_ADD_HEADERS([])
 TEA_ADD_INCLUDES([])
 TEA_ADD_LIBS([])
-TEA_ADD_CFLAGS([])
+# Include files for R disabled for FreeBSD build
+# TEA_ADD_CFLAGS([-Icompat -Icompat/R])
+TEA_ADD_CFLAGS([-Icompat])
 TEA_ADD_STUB_SOURCES([])
 TEA_ADD_TCL_SOURCES([])
-
-#--------------------------------------------------------------------
-# __CHANGE__
-#
-# You can add more files to clean if your extension creates any extra
-# files by extending CLEANFILES.
-# Add pkgIndex.tcl if it is generated in the Makefile instead of ./configure
-# and change Makefile.in to move it from CONFIG_CLEAN_FILES to BINARIES var.
-#
-# A few miscellaneous platform-specific items:
-# TEA_ADD_* any platform specific compiler/build info here.
-#--------------------------------------------------------------------
-
-#CLEANFILES="$CLEANFILES pkgIndex.tcl"
-if test "${TEA_PLATFORM}" = "windows" ; then
-    # Ensure no empty if clauses
-    :
-    #TEA_ADD_SOURCES([win/winFile.c])
-    #TEA_ADD_INCLUDES([-I\"$(${CYGPATH} ${srcdir}/win)\"])
-else
-    # Ensure no empty else clauses
-    :
-    #TEA_ADD_SOURCES([unix/unixFile.c])
-    #TEA_ADD_LIBS([-lsuperfly])
-fi
 
 #--------------------------------------------------------------------
 # __CHANGE__
@@ -175,9 +152,21 @@ fi
 TEA_PUBLIC_TCL_HEADERS
 #TEA_PRIVATE_TCL_HEADERS
 
-#TEA_PUBLIC_TK_HEADERS
-#TEA_PRIVATE_TK_HEADERS
-#TEA_PATH_X
+#--------------------------------------------------------------------
+# __CHANGE__
+# A few miscellaneous platform-specific items:
+#
+# Define a special symbol for Windows (BUILD_Tktable in this case) so
+# that we create the export library with the dll.
+#
+# Windows creates a few extra files that need to be cleaned up.
+# You can add more files to clean if your extension creates any extra
+# files.
+#
+# TEA_ADD any extra compiler/build info here.
+#--------------------------------------------------------------------
+
+TEA_ADD_CLEANFILES([pkgIndex.tcl])
 
 #--------------------------------------------------------------------
 # Check whether --enable-threads or --disable-threads was given.
@@ -208,6 +197,15 @@ TEA_CONFIG_CFLAGS
 TEA_ENABLE_SYMBOLS
 
 #--------------------------------------------------------------------
+# Everyone should be linking against the Tcl stub library.  If you
+# can't for some reason, remove this definition.  If you aren't using
+# stubs, you also need to modify the SHLIB_LD_LIBS setting below to
+# link against the non-stubbed Tcl library.
+#--------------------------------------------------------------------
+
+AC_DEFINE(USE_TCL_STUBS)
+
+#--------------------------------------------------------------------
 # This macro generates a line to use when building a library.  It
 # depends on values set by the TEA_ENABLE_SHARED, TEA_ENABLE_SYMBOLS,
 # and TEA_LOAD_TCLCONFIG macros above.
@@ -224,7 +222,6 @@ TEA_MAKE_LIB
 #--------------------------------------------------------------------
 
 TEA_PROG_TCLSH
-#TEA_PROG_WISH
 
 #--------------------------------------------------------------------
 # Finally, substitute all of the various values into the Makefile.

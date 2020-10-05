@@ -1,3 +1,28 @@
+2020-10-05  Matt Adams  <matt.adams@stuffbymatt.ca>
+
+	* rtcl.test: Make two tests expect exact errors so as to better
+	detect changes upstream.
+
+	* rtcl.c: Fix bug that would cause REval to only process the first
+	of n expressions passed to it. Also cleaned up error messages
+	returned from R so these can be more easily parsed in Tcl.
+
+	* Makefile.in, configure.ac: Bring back R_ placeholders and custom
+	script to find R because the environment could not be found with
+	the merged changes (not sure why, didn't bother to investigate
+	further). Didn't make use of R's compat includes as these would be
+	out-of-date with R's actual includes and it would be better to use
+	latter verbatim (left compat/R as an example of what could be
+	done).
+
+	* Merged changes from Christian with adjustments as noted
+	above. Removed numerous sample files from TEA. Rtcl moves to
+	version 1.2.
+
+2020-01-01  Christian Werner <undroidwish@gmail.com>
+
+	Reworked everything to use runtime linking libR.so et.al.
+
 2018-05-13  Matt Adams  <matt.adams@stuffbymatt.ca>
 
 	* rtcl.c: New Rtcl 1.1 version adds optional -verbose switch to

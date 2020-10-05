@@ -2,5 +2,69 @@
 # Tcl package index file
 #
 
-package ifneeded @PACKAGE_NAME@ @PACKAGE_VERSION@ \
-    [list load [file join $dir @PKG_LIB_FILE@] @PACKAGE_NAME@]
+if {$::tcl_platform(platform) eq "windows"} {
+    package ifneeded @PACKAGE_NAME@ @PACKAGE_VERSION@ [format {
+	apply { {dir} {
+	    if {$::tcl_platform(pointerSize) > 4} {
+		set subdir bin/x64
+	    } else {
+		set subdir bin/i386
+	    }
+	    if {[info exists ::env(R_HOME)]} {
+		set dll [file join $::env(R_HOME) $subdir R.dll]
+		if {[file readable $dll]} {
+		    set r_dll $dll
+		}
+	    }
+	    if {![info exists r_dll]} {
+		if {![info exists ::env(ProgramFiles)]} {
+		    return -code error "no ProgramFiles in environment"
+		}
+		# prefer highest R 3.x version found
+		foreach r_dir [lsort -dictionary -decreasing \
+		    [glob -nocomplain -type d -dir \
+			 [file join $::env(ProgramFiles) R] R-3.*]] {
+		    set dll [file join $r_dir $subdir R.dll]
+		    if {[file readable $dll]} {
+			set r_dll $dll
+			break
+		    }
+		}
+		if {![info exists r_dll]} {
+		    if {$::tcl_platform(pointerSize) > 4 ||
+			![info exists ::env(ProgramW6432)]} {
+			return -code error "R.dll not found"
+		    }
+		    foreach r_dir [lsort -dictionary -decreasing \
+			[glob -nocomplain -type d -dir \
+			     [file join $::env(ProgramW6432) R] R-3.*]] {
+			set dll [file join $r_dir bin/i386 R.dll]
+			if {[file readable $dll]} {
+			    set r_dll $dll
+			    break
+			}
+		    }
+		    if {![info exists r_dll]} {
+			return -code error "R.dll not found"
+		    }
+		}
+		set ::env(R_HOME) $r_dir
+	    }
+	    # path for finding additional shared libs
+	    if {[string match "*;" $::env(PATH)]} {
+		set s1 ""
+		set s2 ";"
+	    } else {
+		set s1 ";"
+		set s2 ""
+	    }
+	    append ::env(PATH) $s1 [file nativename [file dirname $r_dll]] $s2
+	    unset -nocomplain subdir dll s1 s2
+	    # shared lib expects R.dll's full path in variable r_dll
+	    load [list [file join $dir @PKG_LIB_FILE@]] @PACKAGE_NAME@
+	} } %s
+    } [list $dir]]
+} else {
+    package ifneeded @PACKAGE_NAME@ @PACKAGE_VERSION@ \
+	[list load [file join $dir @PKG_LIB_FILE@] @PACKAGE_NAME@]
+}

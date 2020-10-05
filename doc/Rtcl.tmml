@@ -1,12 +1,12 @@
 [comment {-*- tcl -*- Rtcl package}]
-[manpage_begin Rtcl n 1.1]
+[manpage_begin Rtcl n 1.2]
 [see_also R]
 [copyright {2003 Neil McKay <mckay@eecs.umich.edu>}]
-[copyright {2018 Matt Adams <matt.adams@radicaldynamic.com>}]
+[copyright {2020 Matt Adams <matt.adams@radicaldynamic.com>}]
 [moddesc {Interface to the R Statistical Language}]
 [titledesc {Embed an interpreter for the R Statistical Language into Tcl}]
 [require Tcl 8.6]
-[require Rtcl 1.1]
+[require Rtcl 1.2]
 [description]
 
 The Rtcl package provides a way to embed an interpreter for the R
@@ -26,22 +26,22 @@ Rtcl routines with [cmd catch] or [cmd try].
 
 [list_begin definitions]
 
-[call [cmd ::rtcl::eval] [arg ?-verbose?] [arg {R Expression}]]
+[call [cmd ::rtcl::eval] [arg ?-verbose?] [arg {R Expression(s)}]]
 
-Evaluates an [arg {R Expression}] inside the embedded R interpreter.
-Returns an error message if the expression cannot be parsed or
-evaluated. Returns nothing if successful.
+Evaluates any number of [arg {R Expression(s)}] inside the embedded R
+interpreter.  Returns an error message if the expression cannot be
+parsed or evaluated. Returns nothing if successful.
 
 [para]
 
 If [arg -verbose] (optional) is present, the R interpreter will print
-the results of R expressions to stdout as they are evaluated. This may
-be used to debug the results of R expressions as Rtcl commands are
-run. For example:
+the results ofexpressions to stdout as they are evaluated. This may be
+used to debug the results of expressions as Rtcl commands are run. For
+example:
 
 [example_begin]$ tclsh
 % package require Rtcl
-1.1
+1.2
 % ::rtcl::eval {x <- 1+1}
 % ::rtcl::getvalue {x}
 2.0
@@ -52,11 +52,11 @@ run. For example:
 %
 [example_end]
 
-[call [cmd ::rtcl::source] [arg ?-verbose?] [arg /path/to/foo.R]]
+[call [cmd ::rtcl::source] [arg ?-verbose?] [arg foo.R]]
 
 Sources a file into the embedded R interpreter. Takes a single
-argument that must be the fully qualified path to a valid R
-file. Returns an error message if the file cannot be found or properly
+argument that must be the path to a valid R file.
+Returns an error message if the file cannot be found or properly
 parsed, and returns nothing if successful.
 
 [para]
@@ -66,57 +66,34 @@ the results of R expressions to stdout as they are evaluated. This may
 be used to debug the results of R expressions as Rtcl commands are
 run.
 
-[call [cmd ::rtcl::gettype] [arg ?-verbose?] [arg {R Expression}]]
+[call [cmd ::rtcl::gettype] [arg ?-verbose?] [arg {R Expression(s)}]]
 
-Evaluates an [arg {R Expression}] inside the embedded R interpreter.
-Returns an error if the expression cannot be parsed or evaluated.
-Otherwise, it returns the R data type of the result.
-
-[para]
-
-If [arg -verbose] (optional) is present, the R interpreter will print
-the results of R expressions to stdout as they are evaluated. This may
-be used to debug the results of R expressions as Rtcl commands are
-run.
-
-[call [cmd ::rtcl::getvalue] [arg ?-verbose?] [arg {R Expression}]]
-
-Evaluates an [arg {R Expression}] inside the embedded R interpreter.
-Returns an error if the expression cannot be parsed or evaluated. It
-then tries to convert the returned value to a Tcl equivalent. If it
-can, it returns the value; otherwise, it returns an error.
+Evaluates any number of [arg {R Expression(s)}] inside the embedded R
+interpreter.  Returns an error if the expression cannot be parsed or
+evaluated.  Otherwise, it returns the R data type of the last  result.
 
 [para]
 
 If [arg -verbose] (optional) is present, the R interpreter will print
-the results of R expressions to stdout as they are evaluated. This may
-be used to debug the results of R expressions as Rtcl commands are
+the results of expressions to stdout as they are evaluated. This may
+be used to debug the results of expressions as Rtcl commands are run.
+
+[call [cmd ::rtcl::getvalue] [arg ?-verbose?] [arg {R Expression(s)}]]
+
+Evaluates any number of [arg {R Expression(s)}] inside the embedded R
+interpreter.  Returns an error if the expression cannot be parsed or
+evaluated. It then tries to convert the returned value to a Tcl
+equivalent. If it can, it returns the last value; otherwise, it
+returns an error.
+
+[para]
+
+If [arg -verbose] (optional) is present, the R interpreter will print
+the results of expressions to stdout as they are evaluated. This may
+be used to debug the results of expressions as Rtcl commands are
 run.
 
 [list_end]
-
-[section FREEBSD]
-
-On FreeBSD there is a long standing issue with libgcc_s.so in base
-that affects loading of this extension. R is built using gcc6 and uses
-a special [emph LD_LIBRARY_PATH] to instruct the dynamic linker to
-find the appropriate GCC libraries since the base libgcc_s doesn't
-supply the required references.
-
-[para]
-
-Likewise, [syscmd tclsh] must be started with the same [emph LD_LIBRARY_PATH]
-in order to load the Rtcl package. The following commands assume
-the Bourne shell and will set up the environment accordingly.
-Note that [syscmd /path/to/R] must be adjusted for your system
-(typically [syscmd /usr/local/bin/R]).
-
-[example_begin]$ export R_HOME=`echo 'cat(R.home())' | /path/to/R --slave`
-$ . $R_HOME/etc/ldpaths
-$ /path/to/tclsh your_script.tcl
-[example_end]
-
-See the Rtcl README file for further details.
 
 [keywords Tcl Rtcl R Statistics]
 

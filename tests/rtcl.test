@@ -24,7 +24,7 @@ if {[lsearch [namespace children] ::tcltest] == -1} {
 
 # Would typically use "package require Rtcl" but it may not be
 # installed yet
-load ./libRtcl1.1.so
+load ./libRtcl1.2.so
 
 test eval-1.0 {
     Evaluate an R expression (successfully)
@@ -60,7 +60,7 @@ test source-1.2 {
     Source a non-existent R file
 } -body {
     ::rtcl::source {tests/source-1.2.R}
-} -result {Error in file*cannot open the connection} -match {glob} -returnCodes {error}
+} -result {Error in file(filename, "r", encoding = encoding) : cannot open the connection} -match {exact} -returnCodes {error}
 
 test gettype-1.0 {
     Get the R data type resulting from an R expression (successful)

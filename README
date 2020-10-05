@@ -26,8 +26,8 @@ INSTALLATION
 Installation of Rtcl follows Tcl's usual configure/make/make install
 pattern. A typical installation on Unix will look like:
 
-    % tar xvzf Rtcl1.1.tar.gz
-    % cd Rtcl1.1
+    % tar xvzf Rtcl1.2.tar.gz
+    % cd Rtcl1.2
     % ./configure
     % make
     % make test
@@ -56,7 +56,7 @@ Fire up your tclsh:
 
     tclsh8.6
     % package require Rtcl
-    1.1
+    1.2
 
 Use `man Rtcl` for further details.
 
@@ -74,6 +74,7 @@ KNOWN TO WORK ON
 ================
 
 - FreeBSD 11.1 with Tcl 8.6.8 and R 3.4.4
+- FreeBSD 12.1 with Tcl 8.6.10 and R 4.0.2
   Reported by Matt Adams
 
 - Ubuntu 14.4 LTS with Tcl 8.6.7 and R 3.4.4
@@ -147,6 +148,9 @@ I am currently building this extension using gcc6 6.4.0 on FreeBSD
 software is installed from packages. YMMV if you use ports or have
 changed default configurations.
 
+Note that this may no longer be an issue as documented above as of
+Rtcl 1.2 on FreeBSD 12.1-RELEASE-p3.
+
 
 HISTORY
 =======
@@ -154,6 +158,10 @@ HISTORY
 Versions 0.1 through 0.3 were initially developed and released by Neil
 McKay on Redhat Linux 8. Versions 1.0 and later were revised and
 packaged by Matt Adams on FreeBSD 11.
+
+Version 1.2 incorporated changes from Christian Werner as made for
+Androwish. See http://androwish.org/home/dir?ci=tip&name=undroid/Rtcl
+for Christian's codebase which is derived from this one.
 
 See ChangeLog for detailed notes.
 

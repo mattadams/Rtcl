@@ -488,8 +488,12 @@ REval(
   *s = R_NilValue;
 
   for (i = 0; i < l; i++) {
-    val = R_tryEval(VECTOR_ELT(exp, i), R_GlobalEnv, &evalError);
-
+    if (verbose) {
+      val = R_tryEval(VECTOR_ELT(exp, i), R_GlobalEnv, &evalError);
+    } else {
+      val = R_tryEvalSilent(VECTOR_ELT(exp, i), R_GlobalEnv, &evalError);
+    }
+    
     if (evalError) {
       Rf_unprotect(2);
 
@@ -511,11 +515,12 @@ REval(
       err_cleanup(errmsg, errmsg);
       Tcl_SetResult(interp, errmsg, TCL_VOLATILE);
       Tcl_DStringFree(&ds);
-
+      
       return TCL_ERROR;
     } else if (verbose) {
       Rf_PrintValue(val);
     }
+    
     *s = val;
   }
 
@@ -624,7 +629,12 @@ Rtcl_source(
   Tcl_DecrRefCount(pathObj);
   exp = Rf_protect(Rf_lang2(Rf_install("source"), Rf_mkString(str)));
   Tcl_DStringFree(&ds);
-  val = R_tryEval(exp, R_GlobalEnv, &evalError);
+
+  if (verbose) {
+    val = R_tryEval(exp, R_GlobalEnv, &evalError);
+  } else {
+    val = R_tryEvalSilent(exp, R_GlobalEnv, &evalError);
+  }
 
   if (evalError) {
     Rf_unprotect(1);

@@ -3,7 +3,7 @@
 '\" Copyright (c) 2003 Neil McKay <mckay@eecs\&.umich\&.edu>
 '\" Copyright (c) 2020 Matt Adams <matt\&.adams@radicaldynamic\&.com>
 '\"
-.TH "Rtcl" n 1\&.2 Rtcl "Interface to the R Statistical Language"
+.TH "Rtcl" n 1\&.2\&.1 Rtcl "Interface to the R Statistical Language"
 .\" The -*- nroff -*- definitions below are for supplemental macros used
 .\" in Tcl/Tk manual entries.
 .\"
@@ -277,7 +277,7 @@ Rtcl \- Embed an interpreter for the R Statistical Language into Tcl
 .SH SYNOPSIS
 package require \fBTcl  8\&.6\fR
 .sp
-package require \fBRtcl  1\&.2\fR
+package require \fBRtcl  1\&.2\&.1\fR
 .sp
 \fB::rtcl::eval\fR \fI?-verbose?\fR \fIR Expression(s)\fR
 .sp
@@ -289,9 +289,10 @@ package require \fBRtcl  1\&.2\fR
 .sp
 .BE
 .SH DESCRIPTION
-The Rtcl package provides a way to embed an interpreter for the R
-statistical language into Tcl, and make it accessible via Tcl
-commands\&.
+The Rtcl package embeds an interpreter for the R statistical language
+into Tcl, and make it accessible via Tcl commands\&. It provides
+commands for evaluating R expressions, for importing their values into
+Tcl, and for determining their type\&.
 .PP
 This extension requires that R be installed and working properly\&.
 .PP
@@ -305,14 +306,14 @@ interpreter\&.  Returns an error message if the expression cannot be
 parsed or evaluated\&. Returns nothing if successful\&.
 .sp
 If \fI-verbose\fR (optional) is present, the R interpreter will print
-the results ofexpressions to stdout as they are evaluated\&. This may be
+the results of expressions to stdout as they are evaluated\&. This may be
 used to debug the results of expressions as Rtcl commands are run\&. For
 example:
 .CS
 
 $ tclsh
 % package require Rtcl
-1\&.2
+1\&.2\&.1
 % ::rtcl::eval {x <- 1+1}
 % ::rtcl::getvalue {x}
 2\&.0
@@ -329,20 +330,11 @@ Sources a file into the embedded R interpreter\&. Takes a single
 argument that must be the path to a valid R file\&.
 Returns an error message if the file cannot be found or properly
 parsed, and returns nothing if successful\&.
-.sp
-If \fI-verbose\fR (optional) is present, the R interpreter will print
-the results of R expressions to stdout as they are evaluated\&. This may
-be used to debug the results of R expressions as Rtcl commands are
-run\&.
 .TP
 \fB::rtcl::gettype\fR \fI?-verbose?\fR \fIR Expression(s)\fR
 Evaluates any number of \fIR Expression(s)\fR inside the embedded R
 interpreter\&.  Returns an error if the expression cannot be parsed or
 evaluated\&.  Otherwise, it returns the R data type of the last  result\&.
-.sp
-If \fI-verbose\fR (optional) is present, the R interpreter will print
-the results of expressions to stdout as they are evaluated\&. This may
-be used to debug the results of expressions as Rtcl commands are run\&.
 .TP
 \fB::rtcl::getvalue\fR \fI?-verbose?\fR \fIR Expression(s)\fR
 Evaluates any number of \fIR Expression(s)\fR inside the embedded R
@@ -350,11 +342,6 @@ interpreter\&.  Returns an error if the expression cannot be parsed or
 evaluated\&. It then tries to convert the returned value to a Tcl
 equivalent\&. If it can, it returns the last value; otherwise, it
 returns an error\&.
-.sp
-If \fI-verbose\fR (optional) is present, the R interpreter will print
-the results of expressions to stdout as they are evaluated\&. This may
-be used to debug the results of expressions as Rtcl commands are
-run\&.
 .PP
 .SH "SEE ALSO"
 R

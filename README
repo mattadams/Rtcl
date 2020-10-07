@@ -175,4 +175,5 @@ README
 configure.ac (line 22)
 doc/Rtcl.tmml
 doc/Rtcl.n
+generic/rtcl.c (line 1021)
 tests/rtcl.test (line 27)

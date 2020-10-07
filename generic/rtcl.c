@@ -1018,7 +1018,7 @@ initDone:
   }
 
   /* Changed this to check for an error */
-  if (Tcl_PkgProvide(interp, "Rtcl", "1.2") == TCL_ERROR) {
+  if (Tcl_PkgProvide(interp, "Rtcl", "1.2.1") == TCL_ERROR) {
     return TCL_ERROR;
   }
 

@@ -24,7 +24,7 @@ if {[lsearch [namespace children] ::tcltest] == -1} {
 
 # Would typically use "package require Rtcl" but it may not be
 # installed yet
-load ./libRtcl1.2.so
+load ./libRtcl1.2.1.so
 
 test eval-1.0 {
     Evaluate an R expression (successfully)

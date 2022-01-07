@@ -27,6 +27,7 @@ typedef void (*fn_Rf_unprotect)(int i);
 typedef SEXP (*fn_R_ParseVector)(SEXP e, int i, ParseStatus *s, SEXP f);
 /* extern int: R_SignalHandlers */
 typedef SEXP (*fn_R_tryEval)(SEXP e, SEXP f, int *i);
+typedef SEXP (*fn_R_tryEvalSilent)(SEXP e, SEXP f, int *i);
 typedef SEXP (*fn_SET_STRING_ELT)(SEXP e, R_xlen_t i, SEXP f);
 typedef void (*fn_setup_Rmainloop)(void);
 typedef SEXP (*fn_STRING_ELT)(SEXP e, R_xlen_t i);
@@ -61,6 +62,7 @@ struct libR_dl {
     fn_R_ParseVector m_R_ParseVector;
     int *m_R_SignalHandlers;
     fn_R_tryEval m_R_tryEval;
+    fn_R_tryEvalSilent m_R_tryEvalSilent;
     fn_SET_STRING_ELT m_SET_STRING_ELT;
     fn_setup_Rmainloop m_setup_Rmainloop;
     fn_STRING_ELT m_STRING_ELT;
@@ -97,6 +99,7 @@ extern struct libR_dl libR_dl;
 #define R_ParseVector libR_dl.m_R_ParseVector
 #define R_SignalHandlers *libR_dl.m_R_SignalHandlers
 #define R_tryEval libR_dl.m_R_tryEval
+#define R_tryEvalSilent libR_dl.m_R_tryEvalSilent
 #define SET_STRING_ELT libR_dl.m_SET_STRING_ELT
 #define setup_Rmainloop libR_dl.m_setup_Rmainloop
 #define STRING_ELT libR_dl.m_STRING_ELT

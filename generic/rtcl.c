@@ -976,6 +976,7 @@ libLoaded:
     LIBR_SYM_FN(R_ParseVector);
     LIBR_SYM_TYPE(R_SignalHandlers, int *);
     LIBR_SYM_FN(R_tryEval);
+    LIBR_SYM_FN(R_tryEvalSilent);
     LIBR_SYM_FN(SET_STRING_ELT);
     LIBR_SYM_FN(setup_Rmainloop);
     LIBR_SYM_FN(STRING_ELT);
@@ -1018,7 +1019,7 @@ initDone:
   }
 
   /* Changed this to check for an error */
-  if (Tcl_PkgProvide(interp, "Rtcl", "1.2.1") == TCL_ERROR) {
+  if (Tcl_PkgProvide(interp, "Rtcl", "1.2.2") == TCL_ERROR) {
     return TCL_ERROR;
   }
 

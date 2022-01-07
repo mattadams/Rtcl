@@ -19,7 +19,7 @@ dnl	to configure the system for the local environment.
 # so that we create the export library with the dll.
 #-----------------------------------------------------------------------
 
-AC_INIT([Rtcl], [1.2.1])
+AC_INIT([Rtcl], [1.2.2])
 
 #-----------------------------------------------------------------------
 # Find all the R-related stuff: include files, libraries, ...

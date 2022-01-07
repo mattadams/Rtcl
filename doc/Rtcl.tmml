@@ -6,7 +6,7 @@
 [moddesc {Interface to the R Statistical Language}]
 [titledesc {Embed an interpreter for the R Statistical Language into Tcl}]
 [require Tcl 8.6]
-[require Rtcl 1.2.1]
+[require Rtcl 1.2.2]
 [description]
 
 The Rtcl package embeds an interpreter for the R statistical language
@@ -42,7 +42,7 @@ example:
 
 [example_begin]$ tclsh
 % package require Rtcl
-1.2.1
+1.2.2
 % ::rtcl::eval {x <- 1+1}
 % ::rtcl::getvalue {x}
 2.0

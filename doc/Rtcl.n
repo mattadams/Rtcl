@@ -277,7 +277,7 @@ Rtcl \- Embed an interpreter for the R Statistical Language into Tcl
 .SH SYNOPSIS
 package require \fBTcl  8\&.6\fR
 .sp
-package require \fBRtcl  1\&.2\&.1\fR
+package require \fBRtcl  1\&.2\&.2\fR
 .sp
 \fB::rtcl::eval\fR \fI?-verbose?\fR \fIR Expression(s)\fR
 .sp
@@ -313,7 +313,7 @@ example:
 
 $ tclsh
 % package require Rtcl
-1\&.2\&.1
+1\&.2\&.2
 % ::rtcl::eval {x <- 1+1}
 % ::rtcl::getvalue {x}
 2\&.0
